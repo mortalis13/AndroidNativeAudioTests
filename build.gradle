@@ -1,0 +1,71 @@
+apply plugin: 'com.android.application'
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.3.0'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+
+android {
+    compileSdk 33
+    // ndkVersion "25.1.8937393"
+    
+    defaultConfig {
+        namespace "org.home.nativetests"
+        
+        minSdkVersion 30
+        targetSdkVersion 33
+        
+        versionCode 1
+        versionName "1.0"
+
+        externalNativeBuild {
+            cmake {
+                // cppFlags "-std=c++17 -Wall"
+                arguments "-DANDROID_STL=c++_shared"
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    
+    buildFeatures {
+        prefab true
+    }
+
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+            version '3.22.1'
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    
+    implementation "com.google.oboe:oboe:1.7.0"
+}
+
+def appStart() {
+  return "adb shell am start -n ${android.namespace}/.MainActivity".split()
+}
+
+task appStart(type: Exec, dependsOn: 'installDebug') {
+  commandLine appStart()
+}
